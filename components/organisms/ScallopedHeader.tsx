@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, Pressable, Animated as RNAnimated, Platform } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, usePathname } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { SketchyBorder } from '../atoms/SketchyBorder';
 import { useBudgetStore } from '../../store/useBudgetStore';
 import { useHeaderStore } from '../../store/useHeaderStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 /**
  * ScallopedHeader - Refined to match the exact spacing and pill-style nav of the mockup.
@@ -14,6 +15,9 @@ export const ScallopedHeader = () => {
   const totalItems = cartItems.reduce((acc, i) => acc + i.quantity, 0);
 
   const isVisible = useHeaderStore(s => s.isVisible);
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login' || pathname === '/verify';
   const translateY = useRef(new RNAnimated.Value(0)).current;
 
   useEffect(() => {
@@ -64,17 +68,19 @@ export const ScallopedHeader = () => {
 
           {/* Action Icons */}
           <View className="flex-row gap-3">
-             <Link href="/cart" asChild>
-               <Pressable className="relative w-11 h-11 bg-white rounded-2xl border-2 border-chibi-brown items-center justify-center shadow-sm">
-                  <Text className="text-xl">🧺</Text>
-                  {totalItems > 0 && (
-                    <View className="absolute -top-2 -right-2 bg-red-500 border-2 border-chibi-brown w-6 h-6 rounded-full items-center justify-center z-50">
-                      <Text className="font-black text-[10px] text-white">{totalItems}</Text>
-                    </View>
-                  )}
-               </Pressable>
-             </Link>
-             <Link href="/account" asChild>
+             {!isAuthPage && (
+               <Link href="/cart" asChild>
+                 <Pressable className="relative w-11 h-11 bg-white rounded-2xl border-2 border-chibi-brown items-center justify-center shadow-sm">
+                    <Text className="text-xl">🧺</Text>
+                    {totalItems > 0 && (
+                      <View className="absolute -top-2 -right-2 bg-red-500 border-2 border-chibi-brown w-6 h-6 rounded-full items-center justify-center z-50">
+                        <Text className="font-black text-[10px] text-white">{totalItems}</Text>
+                      </View>
+                    )}
+                 </Pressable>
+               </Link>
+             )}
+             <Link href={isAuthenticated ? "/account" : "/login"} asChild>
                <Pressable className="w-11 h-11 bg-white rounded-2xl border-2 border-chibi-brown items-center justify-center shadow-sm">
                   <Text className="text-xl">👤</Text>
                </Pressable>
