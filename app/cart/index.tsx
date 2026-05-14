@@ -13,25 +13,23 @@ import { animate } from 'animejs';
 export default function CartScreen() {
   const router = useRouter();
   const handleScroll = useSmartHeaderScroll();
-  const { budget, cartItems, isSurprise, addItem, removeItem, deleteItem } = useBudgetStore();
+  const { budget, cartItems, isSurprise, canCheckout, addItem, removeItem, deleteItem } = useBudgetStore();
 
-  const boxItems = cartItems.filter(item => item.isInBudgetBox);
-  const standardItems = cartItems.filter(item => !item.isInBudgetBox);
+  const boxItems = cartItems.filter(item => item.isPartOfBox);
+  const standardItems = cartItems.filter(item => !item.isPartOfBox);
   
   // If surprise mode is on, the box total is exactly the budget
-  const boxTotal = isSurprise ? budget : boxItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const standardTotal = standardItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const boxTotal = isSurprise ? budget : boxItems.reduce((acc, item) => acc + (item.basePrice.amount * item.quantity), 0);
+  const standardTotal = standardItems.reduce((acc, item) => acc + (item.basePrice.amount * item.quantity), 0);
   const grandTotal = boxTotal + standardTotal;
 
   const remaining = Math.max(0, budget - boxTotal);
   const progressPercent = Math.min(100, Math.max(0, (boxTotal / Math.max(1, budget)) * 100));
   
-  const hasPork = cartItems.some(item => 
-    item.name.toLowerCase().includes('pork') || item.tags?.includes('Pork')
-  );
+  const hasPork = cartItems.some(item => item.isPork);
 
   const isEmpty = cartItems.length === 0 && !isSurprise;
-  const isLocked = isEmpty || (!isSurprise && boxItems.length > 0 && boxTotal !== budget);
+  const isLocked = !canCheckout;
 
   const btnAnimObj = useRef({ scale: 1 });
   const btnRef = useRef(null);
@@ -75,7 +73,7 @@ export default function CartScreen() {
             {/* Left Column: Items */}
             <View className="flex-[2] flex-col gap-8">
               
-              {/* Pork Warning */}
+              {/* Pork Warning - Driven by API isPork flag */}
               {hasPork && (
                 <SketchyBorder variance={2} backgroundColor="#FEF2F2" borderColor="#EF4444" padding={16} className="mb-4">
                   <View className="flex-row items-start">
@@ -209,7 +207,7 @@ export default function CartScreen() {
                   <Text className="font-black text-2xl text-chibi-brown">RM {grandTotal.toFixed(2)}</Text>
                 </View>
 
-                {/* Finalize Order Button */}
+                {/* Finalize Order Button - Driven by store canCheckout */}
                 <Animated.View ref={btnRef}>
                   <Pressable
                     disabled={isLocked}
@@ -228,7 +226,7 @@ export default function CartScreen() {
                   </Pressable>
                 </Animated.View>
                 
-                {isLocked && (
+                {isLocked && !isEmpty && (
                   <Text className="text-center text-xs font-bold text-red-400 mt-3">
                     Box must be exactly RM {budget.toFixed(2)} to checkout.
                   </Text>
@@ -246,14 +244,12 @@ export default function CartScreen() {
   );
 }
 
-const CartItemCard = ({ item, addItem, removeItem, deleteItem }: any) => {
+const CartItemCard = ({ item, addItem, removeItem, deleteItem }: { item: any, addItem: () => void, removeItem: () => void, deleteItem: () => void }) => {
   const baseId = item.id.split('-').slice(0, -1).join('-') || item.id;
 
-  let imageSource = item.image;
+  let imageSource = item.image || { uri: item.imageUrl };
   if (typeof imageSource === 'string' && imageSource.startsWith('http')) {
-    if (item.name.includes('Beef Jerky')) imageSource = require('../../assets/images/beef_jerky.png');
-    else if (item.name.includes('Salmon Skin')) imageSource = require('../../assets/images/salmon_skin.png');
-    else imageSource = require('../../assets/images/beef_jerky.png'); // fallback
+    imageSource = { uri: imageSource };
   }
 
   return (
@@ -296,7 +292,7 @@ const CartItemCard = ({ item, addItem, removeItem, deleteItem }: any) => {
               </Pressable>
             </View>
 
-            <Text className="font-black text-lg text-chibi-brown">RM {(item.price * item.quantity).toFixed(2)}</Text>
+            <Text className="font-black text-lg text-chibi-brown">RM {item.lineTotalAmount.toFixed(2)}</Text>
           </View>
         </View>
       </View>

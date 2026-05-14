@@ -13,9 +13,10 @@ import { animate } from 'animejs';
 const MOCK_PRODUCT_DETAIL = {
   id: 'chicken-jerky',
   title: 'Premium Chicken Jerky',
-  basePrice: 14.99,
+  basePrice: { amount: 14.99, currency: 'MYR' },
   rating: 5,
   reviews: 128,
+  isPork: false,
   description: "Our signature air-dried chicken jerky is crafted with love and a sprinkle of magic. Made from single-ingredient, human-grade chicken breast, these tender strips are slowly dehydrated to lock in flavor and nutrients. Perfect for good boys, sweet girls, and every wagging tail in between.",
   insideTheBag: [
     { type: 'positive', title: '100% Free-Range Chicken Breast:', text: 'Sourced from happy, local farms.' },
@@ -45,7 +46,7 @@ export default function ProductDetailScreen() {
   const [quantity, setQuantity] = useState(1);
 
   const activeSize = MOCK_PRODUCT_DETAIL.sizes[activeSizeIndex];
-  const unitPrice = MOCK_PRODUCT_DETAIL.basePrice * activeSize.multiplier;
+  const unitPrice = MOCK_PRODUCT_DETAIL.basePrice.amount * activeSize.multiplier;
   const totalPrice = unitPrice * quantity;
 
   const btnAnimObj = useRef({ scale: 1 });
@@ -72,13 +73,14 @@ export default function ProductDetailScreen() {
   };
 
   const handleAddToBox = () => {
-    // Add multiple quantities by calling addItem multiple times, or we could update store to handle quantity add
+    // Add multiple quantities by calling addItem multiple times
     for (let i = 0; i < quantity; i++) {
       addItem({
         id: `${MOCK_PRODUCT_DETAIL.id}-${activeSizeIndex}`,
         name: `${MOCK_PRODUCT_DETAIL.title} (${activeSize.label})`,
-        price: unitPrice,
+        basePrice: { amount: unitPrice, currency: 'MYR' },
         tags: [activeSize.label],
+        isPork: MOCK_PRODUCT_DETAIL.isPork,
         image: MOCK_PRODUCT_DETAIL.images[0]
       }, false);
     }
