@@ -27,17 +27,18 @@
 *   [x] Agentic OS Scaffolding.
 *   [x] Phase 1: Technical Architecture Planning.
 *   [x] Phase 2: Core Component Execution (In Progress).
-    *   [x] Design Token Extraction (Colors/Borders).
-    *   [x] Atom: SketchyBorder (Triple-Stroke & Dashed).
-    *   [x] Layout Overhaul: Standardized fixed header and 80% centered footer.
-    *   [x] Feature: Custom Budget Builder (app/budget-box/index.tsx).
-    *   [x] Feature: "Our Reviews" Masonry Grid (app/reviews/index.tsx).
-    *   [x] Asset Upgrade: Animated 3D Chibi Puppy (Home, Our Story).
-    *   [x] Fix: ScallopedHeader ReferenceError & Feather Icon attributes.
-    *   [/] Logic: "Pork Series" category filtering and product hydration.
-    *   [ ] Verification: Final Playwright audit for safe-area compliance.
+*   [x] Design Token Extraction (Colors/Borders).
+*   [x] Atom: SketchyBorder (Triple-Stroke & Dashed).
+*   [x] Layout Overhaul: Standardized fixed header and 80% centered footer.
+*   [x] Feature: Custom Budget Builder (app/budget-box/index.tsx).
+*   [x] Feature: "Our Reviews" Masonry Grid (app/reviews/index.tsx).
+*   [x] Asset Upgrade: Animated 3D Chibi Puppy (Home, Our Story).
+*   [x] Fix: ScallopedHeader ReferenceError & Feather Icon attributes.
+*   [x] Integration: User Profile & Pet Management API (Full flow + Store logic).
+*   [/] Logic: "Pork Series" category filtering and product hydration.
+*   [ ] Verification: Final Playwright audit for safe-area compliance.
 
 ## 6. Tomorrow's Hook
 *   **Pork Series Logic:** Finalize the hydration logic for the Pork Series products in the treats listing.
-*   **Asset Audit:** Verify that all 3D images have correct explicit dimensions for web/native parity.
+*   **Profile UI Polish:** Add specialized input components for pet types and breed selection using the new enum mapping.
 *   **Budget Box Polish:** Refine the "Empty State" for the budget builder when a user enters $0.

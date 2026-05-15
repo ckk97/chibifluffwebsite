@@ -37,7 +37,7 @@ Before code is considered "Final," it must be **Evaluated** against these three 
 *   `[snippet_id: 002]` - **Smart Header Hook:** `useSmartHeaderScroll` logic for hide-on-scroll behavior.
 *   `[snippet_id: 003]` - **Scalloped Edge SVG:** The exact path coordinates for the "Perfectly Imperfect" header bottom.
 *   `[snippet_id: 004]` - **HeaderSpacer Molecule:** Animated height spacer to sync content with sticky header transitions.
-*   `[snippet_id: 005]` - **Masonry Logic:** Staggered 2-column distribution for "Perfectly Imperfect" grids.
+*   `[snippet_id: 006]` - **Profile Update Action:** A Zustand action that maps complex frontend pet structures to backend DTOs and refreshes state post-update.
 
 ## 6. Technical Debt Archive (Archived May 2026)
 *   `[debt: 001]` - Resolved "White Box" image issue by forcing 60x60 dimensions.
@@ -46,13 +46,15 @@ Before code is considered "Final," it must be **Evaluated** against these three 
 *   `[debt: 004]` - Standardized 3D Animated Assets: Replaced hero videos with looping Animated 3D images (Home, Our Story) for better load performance.
 *   `[debt: 005]` - Resolved `ReferenceError: isVisible is not defined` in ScallopedHeader by fixing initialization order during the fixed-header refactor.
 *   `[debt: 006]` - Cleaned up invalid `className` and `fill` attributes on `Feather` icons to prevent potential crashes on native platforms.
+*   `[debt: 007]` - Fixed 404 on profile update by identifying stale API process; established "Restart API after Route Changes" as a standard troubleshooting step.
 
 ---
 **Status:** 
 *   [x] Feature: Custom Budget Builder (app/budget-box/index.tsx).
 *   [x] Asset Upgrade: Animated 3D Chibi Puppy (Home, Our Story).
 *   [x] Fix: ScallopedHeader ReferenceError & Feather Icon attributes.
+*   [x] Integration: User Profile & Pet Management API (api/userApi.ts, store/useUserStore.ts).
 *   [/] Logic: "Pork Series" category filtering and product hydration.
 *   [ ] Verification: Final Playwright audit for safe-area compliance.
 
-Core layout stabilized. 3D animated asset pipeline established. Budget Builder module functional. Ready for "Pork Series" logic and final edge-case verification.
+Core layout stabilized. 3D animated asset pipeline established. Budget Builder module functional. Profile and Pet management integrated. Ready for "Pork Series" logic and final edge-case verification.

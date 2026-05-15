@@ -1,17 +1,21 @@
 import { create } from 'zustand';
-import { userApi } from '../api/userApi';
+import { userApi, PetType, UpdateUserProfileRequest } from '../api/userApi';
 
 interface Pet {
   id: string;
   name: string;
+  type: PetType;
+  breed: string;
+  age: number;
+  imageUri: string;
   birthday: string;
-  icon: string;
 }
 
 interface UserState {
   fullName: string;
   email: string;
   phone: string;
+  birthday: string;
   avatar: string | null;
   pets: Pet[];
   isLoading: boolean;
@@ -23,17 +27,17 @@ interface UserState {
   removePet: (id: string) => void;
   updatePetImage: (id: string, uri: string) => void;
   fetchProfile: () => Promise<void>;
+  updateProfile: (data: UpdateUserProfileRequest) => Promise<void>;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set, get) => ({
   fullName: 'Alex Pawsome',
   email: 'alex@example.com',
   phone: '(555) 123-4567',
+  birthday: '',
   avatar: null,
   isLoading: false,
-  pets: [
-    { id: '1', name: 'Barnaby', birthday: 'May 12, 2020', icon: '🐶' }
-  ],
+  pets: [],
   setFullName: (name) => set({ fullName: name }),
   setEmail: (email) => set({ email: email }),
   setPhone: (phone) => set({ phone: phone }),
@@ -45,7 +49,7 @@ export const useUserStore = create<UserState>((set) => ({
     pets: state.pets.filter((p) => p.id !== id) 
   })),
   updatePetImage: (id, uri) => set((state) => ({
-    pets: state.pets.map(p => p.id === id ? { ...p, icon: uri } : p)
+    pets: state.pets.map(p => p.id === id ? { ...p, imageUri: uri } : p)
   })),
   fetchProfile: async () => {
     set({ isLoading: true });
@@ -55,17 +59,51 @@ export const useUserStore = create<UserState>((set) => ({
         fullName: profile.name,
         email: profile.email,
         phone: profile.phoneNumber || '',
+        birthday: profile.birthday || '',
+        avatar: profile.profilePicture,
         pets: profile.pets.map(p => ({
           id: p.id,
           name: p.name,
+          type: p.type,
+          breed: p.breed,
+          age: p.age,
+          imageUri: p.imageUri || '🐾',
           birthday: p.birthday || 'Unknown',
-          icon: p.imageUri || '🐾'
         })),
         isLoading: false
       });
     } catch (e) {
       console.warn('Failed to fetch profile:', e);
       set({ isLoading: false });
+    }
+  },
+  updateProfile: async (data: UpdateUserProfileRequest) => {
+    set({ isLoading: true });
+    try {
+      await userApi.updateProfile(data);
+      // Refresh profile after successful update
+      const updatedProfile = await userApi.getProfile();
+      set({
+        fullName: updatedProfile.name,
+        email: updatedProfile.email,
+        phone: updatedProfile.phoneNumber || '',
+        birthday: updatedProfile.birthday || '',
+        avatar: updatedProfile.profilePicture,
+        pets: updatedProfile.pets.map(p => ({
+          id: p.id,
+          name: p.name,
+          type: p.type,
+          breed: p.breed,
+          age: p.age,
+          imageUri: p.imageUri || '🐾',
+          birthday: p.birthday || 'Unknown',
+        })),
+        isLoading: false
+      });
+    } catch (e) {
+      console.error('Failed to update profile:', e);
+      set({ isLoading: false });
+      throw e;
     }
   }
 }));

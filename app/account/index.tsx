@@ -13,8 +13,8 @@ import { StatusBar } from 'expo-status-bar';
  */
 export default function AccountPage() {
   const { 
-    fullName, email, phone, avatar, pets, isLoading, fetchProfile,
-    setFullName, setEmail, setPhone, setAvatar, addPet, removePet, updatePetImage 
+    fullName, email, phone, birthday, avatar, pets, isLoading, fetchProfile,
+    setFullName, setEmail, setPhone, setAvatar, addPet, removePet, updatePetImage, updateProfile
   } = useUserStore();
   const authUser = useAuthStore((s) => s.user);
 
@@ -63,11 +63,37 @@ export default function AccountPage() {
       addPet({ 
         name: newPetName, 
         birthday: newPetDate, 
-        icon: newPetImage || '🐾' 
+        imageUri: newPetImage || '🐾',
+        type: 3, // Other
+        breed: 'Mixed',
+        age: 0
       });
       setNewPetName('');
       setNewPetDate('');
       setNewPetImage(null);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      await updateProfile({
+        displayName: fullName,
+        phoneNumber: phone,
+        profilePicture: avatar || undefined,
+        // Map pets to UpdatePetRequest format
+        pets: pets.map(p => ({
+          id: p.id,
+          name: p.name,
+          type: p.type,
+          breed: p.breed,
+          age: p.age,
+          imageUri: p.imageUri,
+          birthday: p.birthday
+        }))
+      });
+      alert('Profile updated successfully! ✨');
+    } catch (error) {
+      alert('Failed to update profile. Please try again.');
     }
   };
 
@@ -147,7 +173,7 @@ export default function AccountPage() {
                     </View>
                  </View>
 
-                 <Pressable className="self-start active:scale-95 transition-transform">
+                 <Pressable onPress={handleSaveChanges} className="self-start active:scale-95 transition-transform">
                     <SketchyBorder variance={1} padding={14} backgroundColor="#F9D6D8" doubleLine={false} borderColor="#4A423E">
                        <View className="flex-row items-center gap-2 px-6">
                           <Text className="text-sm font-black text-chibi-brown uppercase tracking-tighter">Save Changes</Text>
@@ -180,10 +206,10 @@ export default function AccountPage() {
                                onPress={() => pickImage(pet.id)}
                                className="w-16 h-16 bg-chibi-pink/10 rounded-full items-center justify-center border border-chibi-brown/10 active:scale-90 overflow-hidden shadow-inner"
                             >
-                               {pet.icon.startsWith('http') || pet.icon.startsWith('/') || pet.icon.startsWith('data:') ? (
-                                 <Image source={{ uri: pet.icon }} className="w-full h-full" />
+                               {pet.imageUri.startsWith('http') || pet.imageUri.startsWith('/') || pet.imageUri.startsWith('data:') ? (
+                                 <Image source={{ uri: pet.imageUri }} className="w-full h-full" />
                                ) : (
-                                 <Text className="text-3xl">{pet.icon}</Text>
+                                 <Text className="text-3xl">{pet.imageUri}</Text>
                                )}
                             </Pressable>
                             <View>

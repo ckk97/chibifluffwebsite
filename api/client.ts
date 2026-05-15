@@ -29,6 +29,7 @@ export const fetchApi = async <T>(endpoint: string, options: RequestOptions = {}
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -39,5 +40,5 @@ export const fetchApi = async <T>(endpoint: string, options: RequestOptions = {}
 
   // Support empty responses
   const text = await response.text();
-  return text ? JSON.parse(text) : {};
+  return (text ? JSON.parse(text) : {}) as T;
 };
