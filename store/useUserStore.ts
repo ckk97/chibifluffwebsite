@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { userApi } from '../api/userApi';
 
 interface Pet {
   id: string;
@@ -13,6 +14,7 @@ interface UserState {
   phone: string;
   avatar: string | null;
   pets: Pet[];
+  isLoading: boolean;
   setFullName: (name: string) => void;
   setEmail: (email: string) => void;
   setPhone: (phone: string) => void;
@@ -20,6 +22,7 @@ interface UserState {
   addPet: (pet: Omit<Pet, 'id'>) => void;
   removePet: (id: string) => void;
   updatePetImage: (id: string, uri: string) => void;
+  fetchProfile: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -27,6 +30,7 @@ export const useUserStore = create<UserState>((set) => ({
   email: 'alex@example.com',
   phone: '(555) 123-4567',
   avatar: null,
+  isLoading: false,
   pets: [
     { id: '1', name: 'Barnaby', birthday: 'May 12, 2020', icon: '🐶' }
   ],
@@ -43,4 +47,25 @@ export const useUserStore = create<UserState>((set) => ({
   updatePetImage: (id, uri) => set((state) => ({
     pets: state.pets.map(p => p.id === id ? { ...p, icon: uri } : p)
   })),
+  fetchProfile: async () => {
+    set({ isLoading: true });
+    try {
+      const profile = await userApi.getProfile();
+      set({
+        fullName: profile.name,
+        email: profile.email,
+        phone: profile.phoneNumber || '',
+        pets: profile.pets.map(p => ({
+          id: p.id,
+          name: p.name,
+          birthday: p.birthday || 'Unknown',
+          icon: p.imageUri || '🐾'
+        })),
+        isLoading: false
+      });
+    } catch (e) {
+      console.warn('Failed to fetch profile:', e);
+      set({ isLoading: false });
+    }
+  }
 }));

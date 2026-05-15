@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Product } from '../types/products';
+import { safeLocalStorage } from '../utils/safeStorage';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -116,15 +117,14 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   },
 
   loadPersistedState: () => {
-    if (typeof window === 'undefined') return;
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeLocalStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         set(parsed);
       }
     } catch (e) {
-      console.warn('BudgetStore: Storage access denied or failed', e);
+      console.warn('BudgetStore: Failed to parse persisted state', e);
     }
   }
 }));
@@ -156,10 +156,9 @@ function updateCheckoutStatus(get: any, set: any) {
 
 // Helper to save state to localStorage
 function saveState(state: any) {
-  if (typeof window === 'undefined') return;
   try {
     const { budget, currentTotal, cartItems, isSurprise, canCheckout } = state;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ budget, currentTotal, cartItems, isSurprise, canCheckout }));
+    safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify({ budget, currentTotal, cartItems, isSurprise, canCheckout }));
   } catch (e) {
     console.warn('BudgetStore: Failed to save state', e);
   }

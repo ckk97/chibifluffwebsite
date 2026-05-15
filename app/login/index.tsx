@@ -1,16 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { useGoogleLogin } from '@react-oauth/google';
+import { animate } from 'animejs';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { animate } from 'animejs';
-import { ScallopedHeader } from '../../components/organisms/ScallopedHeader';
-import { ScallopedFooter } from '../../components/organisms/ScallopedFooter';
+import React, { useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { HeaderSpacer } from '../../components/atoms/HeaderSpacer';
 import { SketchyBorder } from '../../components/atoms/SketchyBorder';
-import { useAuthStore } from '../../store/useAuthStore';
+import { ScallopedFooter } from '../../components/organisms/ScallopedFooter';
+import { ScallopedHeader } from '../../components/organisms/ScallopedHeader';
 import { useSmartHeaderScroll } from '../../hooks/useSmartHeaderScroll';
-import { useGoogleLogin } from '@react-oauth/google';
-import { FontAwesome } from '@expo/vector-icons';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const GoogleBouncyButton = ({ title, onPress }: { title: string, onPress: () => void }) => {
   const btnRef = useRef<View>(null);
@@ -69,22 +69,22 @@ export default function LoginScreen() {
   const [googleError, setGoogleError] = useState('');
   const handleScroll = useSmartHeaderScroll();
   const router = useRouter();
-  
+
   const { login } = useAuthStore();
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await fetch('http://localhost:3000/api/auth/google-callback', {
+        const res = await fetch('http://localhost:8080/api/auth/google-callback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ credential: tokenResponse.access_token })
+          body: JSON.stringify({ idToken: tokenResponse.access_token })
         });
-        
+
         if (res.ok) {
           const data = await res.json();
-          login(data.token);
-          router.replace('/budget-box');
+          login(data.token, data.user);
+          router.replace('/account');
         } else {
           setGoogleError('Google login verification failed.');
         }
@@ -103,7 +103,7 @@ export default function LoginScreen() {
       <ScallopedHeader />
       <ScrollView onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={styles.scrollContent}>
         <HeaderSpacer />
-        
+
         <View className="px-6 flex-1 justify-center items-center py-20">
           <View className="w-full max-w-sm">
             <SketchyBorder variance={4} backgroundColor="#FFF" padding={32}>
@@ -112,7 +112,7 @@ export default function LoginScreen() {
               </Text>
 
               <GoogleBouncyButton title="Continue with Google" onPress={() => handleGoogleLogin()} />
-              
+
               {googleError ? (
                 <View className="mt-4 items-center">
                   <Text className="text-red-500 font-bold text-xs italic">
