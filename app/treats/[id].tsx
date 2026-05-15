@@ -96,8 +96,10 @@ export default function ProductDetailScreen() {
         <View className="max-w-6xl mx-auto w-full px-6 pb-12">
           
           {/* Breadcrumb */}
-          <Link href="/treats" className="mb-6">
-            <Text className="font-bold text-chibi-brown/50 hover:text-chibi-brown">← Back to Menu</Text>
+          <Link href="/treats" asChild>
+            <Pressable className="mb-6">
+              <Text className="font-bold text-chibi-brown/50 hover:text-chibi-brown">← Back to Menu</Text>
+            </Pressable>
           </Link>
 
           <View className="flex-col md:flex-row gap-12">

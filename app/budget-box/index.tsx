@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Animated, Image, useWindowDimensions } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { ScallopedHeader } from '../../components/organisms/ScallopedHeader';
 import { ScallopedFooter } from '../../components/organisms/ScallopedFooter';
 import { SketchyBorder } from '../../components/atoms/SketchyBorder';
@@ -89,15 +89,15 @@ export default function BudgetBoxScreen() {
               ))}
             </View>
 
-            <Pressable 
-              disabled={currentTotal !== budget}
-              onPress={() => router.push('/cart')}
-              className={`py-4 rounded-full border-2 border-chibi-brown items-center justify-center ${currentTotal === budget ? 'bg-chibi-sage shadow-md active:scale-95' : 'bg-gray-300 opacity-50'}`}
-            >
-              <Text className="font-black text-xl text-chibi-brown">
-                {currentTotal === budget ? 'Checkout Now' : 'Fill Your Budget to Checkout'}
-              </Text>
-            </Pressable>
+            <Link href="/cart" asChild disabled={currentTotal !== budget}>
+              <Pressable 
+                className={`py-4 rounded-full border-2 border-chibi-brown items-center justify-center ${currentTotal === budget ? 'bg-chibi-sage shadow-md active:scale-95' : 'bg-gray-300 opacity-50'}`}
+              >
+                <Text className="font-black text-xl text-chibi-brown">
+                  {currentTotal === budget ? 'Checkout Now' : 'Fill Your Budget to Checkout'}
+                </Text>
+              </Pressable>
+            </Link>
           </>
         ) : (
           <View className="flex-1 items-center justify-center py-20">
@@ -105,16 +105,17 @@ export default function BudgetBoxScreen() {
                Let us curate the perfect selection for RM{budget}!
              </Text>
              <View>
-               <Pressable 
-                 onPress={() => router.push('/cart')}
-                 className="bg-chibi-pink py-6 px-10 rounded-[30px] border-4 border-chibi-brown shadow-lg"
-                 style={{ transform: [{ rotate: '-2deg' }] }}
-               >
-                 <Text className="font-black text-3xl text-white text-center">
-                   Surprise My Pet! 🎁
-                 </Text>
-                 <Text className="font-bold text-white/80 text-center mt-2">Value: RM{budget}</Text>
-               </Pressable>
+              <Link href="/cart" asChild>
+                <Pressable 
+                  className="bg-chibi-pink py-6 px-10 rounded-[30px] border-4 border-chibi-brown shadow-lg"
+                  style={{ transform: [{ rotate: '-2deg' }] }}
+                >
+                  <Text className="font-black text-3xl text-white text-center">
+                    Surprise My Pet! 🎁
+                  </Text>
+                  <Text className="font-bold text-white/80 text-center mt-2">Value: RM{budget}</Text>
+                </Pressable>
+              </Link>
              </View>
           </View>
         )}

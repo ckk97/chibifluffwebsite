@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, Pressable, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TextInput, Pressable, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { SketchyBorder } from '../../components/atoms/SketchyBorder';
 import { ScallopedHeader } from '../../components/organisms/ScallopedHeader';
 import { ScallopedFooter } from '../../components/organisms/ScallopedFooter';
 import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { StatusBar } from 'expo-status-bar';
 
 /**
@@ -12,9 +13,18 @@ import { StatusBar } from 'expo-status-bar';
  */
 export default function AccountPage() {
   const { 
-    fullName, email, phone, avatar, pets, 
+    fullName, email, phone, avatar, pets, isLoading, fetchProfile,
     setFullName, setEmail, setPhone, setAvatar, addPet, removePet, updatePetImage 
   } = useUserStore();
+  const authUser = useAuthStore((s) => s.user);
+
+  // Prefer locally-picked avatar > Google profile picture > null
+  const displayAvatar = avatar || authUser?.profilePicture || null;
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
   
   const [newPetName, setNewPetName] = useState('');
   const [newPetDate, setNewPetDate] = useState('');
@@ -66,16 +76,23 @@ export default function AccountPage() {
       <StatusBar style="dark" />
       <ScallopedHeader />
       
-      <ScrollView 
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Header Section */}
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#4A423E" />
+          <Text className="mt-4 text-chibi-brown font-bold">Loading your profile...</Text>
+        </View>
+      ) : (
+        <ScrollView 
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Header Section */}
+
         <View className="items-center py-16 px-10">
            <Pressable onPress={() => pickImage('user')} className="relative mb-8 active:scale-95 transition-transform">
               <View className="w-32 h-32 rounded-full border-2 border-chibi-brown border-dashed items-center justify-center bg-white shadow-sm overflow-hidden">
-                 {avatar ? (
-                   <Image source={{ uri: avatar }} className="w-full h-full" />
+               {displayAvatar ? (
+                   <Image source={{ uri: displayAvatar }} className="w-full h-full" />
                  ) : (
                    <Text className="text-6xl">👩‍🎨</Text>
                  )}
@@ -84,7 +101,7 @@ export default function AccountPage() {
                  <Text className="text-white text-xs font-black">✎</Text>
               </View>
            </Pressable>
-           <Text className="text-5xl font-black text-chibi-brown mb-4 tracking-tighter text-center">Hello, Human!</Text>
+           <Text className="text-5xl font-black text-chibi-brown mb-4 tracking-tighter text-center">Hello, {fullName ? fullName.split(' ')[0] : 'Human'}!</Text>
            <Text className="text-center text-chibi-brown/60 text-xl font-medium max-w-xl leading-8">
               Manage your details and keep your furry friends' information up to date for special treat deliveries!
            </Text>
@@ -247,6 +264,7 @@ export default function AccountPage() {
         <ScallopedFooter />
 
       </ScrollView>
+      )}
     </View>
   );
 }

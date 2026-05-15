@@ -5,7 +5,7 @@ import { ProductCard } from '../../components/molecules/ProductCard';
 import { ScallopedHeader } from '../../components/organisms/ScallopedHeader';
 import { ScallopedFooter } from '../../components/organisms/ScallopedFooter';
 import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { useBudgetStore } from '../../store/useBudgetStore';
 import { useSmartHeaderScroll } from '../../hooks/useSmartHeaderScroll';
 
@@ -56,16 +56,15 @@ export default function TreatsListingPage() {
         {/* Custom Budget Box CTA */}
         <View className="px-10 mb-12 items-center">
           <View className="w-full max-w-4xl">
-            <Pressable 
-              onPress={() => router.push('/budget-box')}
-              className="w-full rotate-1"
-            >
-              <SketchyBorder variance={4} backgroundColor="#FBC02D" padding={20} className="items-center shadow-sm">
-                <Text className="font-black text-2xl text-chibi-brown text-center leading-9 px-4">
-                  ✨ Try our new Custom Budget Box! You name the price, we pack the treats! ✨
-                </Text>
-              </SketchyBorder>
-            </Pressable>
+            <Link href="/budget-box" asChild>
+              <Pressable className="w-full rotate-1">
+                <SketchyBorder variance={4} backgroundColor="#FBC02D" padding={20} className="items-center shadow-sm">
+                  <Text className="font-black text-2xl text-chibi-brown text-center leading-9 px-4">
+                    ✨ Try our new Custom Budget Box! You name the price, we pack the treats! ✨
+                  </Text>
+                </SketchyBorder>
+              </Pressable>
+            </Link>
           </View>
         </View>
 

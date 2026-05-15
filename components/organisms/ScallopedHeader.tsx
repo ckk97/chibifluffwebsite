@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated as RNAnimated, Platform } from 'react-native';
+import { View, Text, Pressable, Animated as RNAnimated, Platform, Image } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { SketchyBorder } from '../atoms/SketchyBorder';
@@ -11,11 +11,13 @@ import { useAuthStore } from '../../store/useAuthStore';
  * ScallopedHeader - Refined to match the exact spacing and pill-style nav of the mockup.
  */
 export const ScallopedHeader = () => {
+  console.log('ScallopedHeader rendering');
   const { cartItems } = useBudgetStore();
   const totalItems = cartItems.reduce((acc, i) => acc + i.quantity, 0);
 
   const isVisible = useHeaderStore(s => s.isVisible);
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const user = useAuthStore(s => s.user);
   const pathname = usePathname();
   const isAuthPage = pathname === '/login' || pathname === '/verify';
   const translateY = useRef(new RNAnimated.Value(0)).current;
@@ -32,6 +34,7 @@ export const ScallopedHeader = () => {
   return (
     <RNAnimated.View 
       className="absolute top-0 left-0 right-0 z-50 pt-10 pb-2" 
+      pointerEvents="box-none"
       style={{ 
         transform: [{ translateY }],
         backgroundColor: '#F9D6D8' // Force exact brand pink
@@ -81,8 +84,12 @@ export const ScallopedHeader = () => {
                </Link>
              )}
              <Link href={isAuthenticated ? "/account" : "/login"} asChild>
-               <Pressable className="w-11 h-11 bg-white rounded-2xl border-2 border-chibi-brown items-center justify-center shadow-sm">
-                  <Text className="text-xl">👤</Text>
+               <Pressable className="w-11 h-11 bg-white rounded-2xl border-2 border-chibi-brown items-center justify-center shadow-sm overflow-hidden">
+                  {isAuthenticated && user?.profilePicture ? (
+                    <Image source={{ uri: user.profilePicture }} style={{ width: '100%', height: '100%' }} />
+                  ) : (
+                    <Text className="text-xl">👤</Text>
+                  )}
                </Pressable>
              </Link>
           </View>

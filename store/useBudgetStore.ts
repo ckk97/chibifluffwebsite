@@ -124,7 +124,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         set(parsed);
       }
     } catch (e) {
-      console.warn('Failed to load persisted state', e);
+      console.warn('BudgetStore: Storage access denied or failed', e);
     }
   }
 }));
@@ -161,6 +161,6 @@ function saveState(state: any) {
     const { budget, currentTotal, cartItems, isSurprise, canCheckout } = state;
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ budget, currentTotal, cartItems, isSurprise, canCheckout }));
   } catch (e) {
-    console.warn('Failed to save state', e);
+    console.warn('BudgetStore: Failed to save state', e);
   }
 }

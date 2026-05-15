@@ -28,10 +28,12 @@ export const SketchyBorder: React.FC<SketchyBorderProps> = ({
   doubleLine = true,
   dashed = false,
 }) => {
+  console.log('SketchyBorder rendering', { className, backgroundColor });
   const [layout, setLayout] = useState({ width: 0, height: 0 });
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
+    console.log('SketchyBorder onLayout:', { width, height, backgroundColor });
     if (Math.abs(width - layout.width) > 1 || Math.abs(height - layout.height) > 1) {
       setLayout({ width, height });
     }
